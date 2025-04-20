@@ -9,18 +9,18 @@ number:
 date:
 consensus: true
 v: 3
-area: art
-workgroup: HTTP
+area: ""
+workgroup: "HTTP"
 keyword:
  - exported authenticators
  - masque
 venue:
-  group: HTTP
-  type: Working Group
-  mail: ietf-http-wg@w3.org
-  arch: https://lists.w3.org/Archives/Public/ietf-http-wg
-  github: yaroslavros/httpbis-secondary-client-certs
-  latest: https://yaroslavros.github.io/httpbis-secondary-client-certs/draft-rosomakho-httpbis-secondary-server-certs.html
+  group: "HTTP"
+  type: ""
+  mail: "ietf-http-wg@w3.org"
+  arch: "https://lists.w3.org/Archives/Public/ietf-http-wg/"
+  github: "yaroslavros/httpbis-secondary-client-certs"
+  latest: "https://yaroslavros.github.io/httpbis-secondary-client-certs/draft-rosomakho-httpbis-secondary-server-certs.html"
 
 author:
  -
