@@ -9,7 +9,7 @@ Expires: 22 October 2025
 
 
           Secondary Certificate Authentication of HTTP Clients
-         draft-rosomakho-httpbis-secondary-server-certs-latest
+         draft-rosomakho-httpbis-secondary-client-certs-latest
 
 Abstract
 
@@ -21,13 +21,13 @@ About This Document
 
    The latest revision of this draft can be found at
    https://yaroslavros.github.io/httpbis-secondary-client-certs/draft-
-   rosomakho-httpbis-secondary-server-certs.html.  Status information
+   rosomakho-httpbis-secondary-client-certs.html.  Status information
    for this document may be found at https://datatracker.ietf.org/doc/
-   draft-rosomakho-httpbis-secondary-server-certs/.
+   draft-rosomakho-httpbis-secondary-client-certs/.
 
-   Discussion of this document takes place on the HTTP Working Group
-   mailing list (mailto:ietf-http-wg@w3.org), which is archived at
-   https://lists.w3.org/Archives/Public/ietf-http-wg.
+   Discussion of this document takes place on the HTTP mailing list
+   (mailto:ietf-http-wg@w3.org), which is archived at
+   https://lists.w3.org/Archives/Public/ietf-http-wg/.
 
    Source for this draft and an issue tracker can be found at
    https://github.com/yaroslavros/httpbis-secondary-client-certs.
