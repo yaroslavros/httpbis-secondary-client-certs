@@ -4,10 +4,10 @@
 
 This is the working area for the individual Internet-Draft, "Secondary Certificate Authentication of HTTP Clients".
 
-* [Editor's Copy](https://yaroslavros.github.io/httpbis-secondary-client-certs/#go.draft-rosomakho-httpbis-secondary-server-certs.html)
-* [Datatracker Page](https://datatracker.ietf.org/doc/draft-rosomakho-httpbis-secondary-server-certs)
-* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-rosomakho-httpbis-secondary-server-certs)
-* [Compare Editor's Copy to Individual Draft](https://yaroslavros.github.io/httpbis-secondary-client-certs/#go.draft-rosomakho-httpbis-secondary-server-certs.diff)
+* [Editor's Copy](https://yaroslavros.github.io/httpbis-secondary-client-certs/#go.draft-rosomakho-httpbis-secondary-client-certs.html)
+* [Datatracker Page](https://datatracker.ietf.org/doc/draft-rosomakho-httpbis-secondary-client-certs)
+* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-rosomakho-httpbis-secondary-client-certs)
+* [Compare Editor's Copy to Individual Draft](https://yaroslavros.github.io/httpbis-secondary-client-certs/#go.draft-rosomakho-httpbis-secondary-client-certs.diff)
 
 
 ## Contributing
