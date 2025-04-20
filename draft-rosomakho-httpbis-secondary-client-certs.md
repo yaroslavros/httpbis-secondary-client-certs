@@ -3,7 +3,7 @@ title: "Secondary Certificate Authentication of HTTP Clients"
 abbrev: "Secondary Clients Certificates"
 category: std
 
-docname: draft-rosomakho-httpbis-secondary-server-certs-latest
+docname: draft-rosomakho-httpbis-secondary-client-certs-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
 date:
@@ -20,7 +20,7 @@ venue:
   mail: "ietf-http-wg@w3.org"
   arch: "https://lists.w3.org/Archives/Public/ietf-http-wg/"
   github: "yaroslavros/httpbis-secondary-client-certs"
-  latest: "https://yaroslavros.github.io/httpbis-secondary-client-certs/draft-rosomakho-httpbis-secondary-server-certs.html"
+  latest: "https://yaroslavros.github.io/httpbis-secondary-client-certs/draft-rosomakho-httpbis-secondary-client-certs.html"
 
 author:
  -
