@@ -28,6 +28,11 @@ author:
     organization: Zscaler
     email: yrosomakho@zscaler.com
 
+ -
+    fullname: Jonathan Hoyland
+    organization: Cloudflare
+    email: jonathan.hoyland@gmail.com
+
 normative:
   H2:
     =: RFC9113
