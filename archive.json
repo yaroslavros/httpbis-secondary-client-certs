@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-05-15T01:52:50.419293+00:00",
+  "timestamp": "2025-05-18T02:01:30.479423+00:00",
   "repo": "yaroslavros/httpbis-secondary-client-certs",
   "labels": [
     {
@@ -50,5 +50,34 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOOc22Vc6WemUq",
+      "title": "Add J. Hoyland as author.",
+      "url": "https://github.com/yaroslavros/httpbis-secondary-client-certs/pull/1",
+      "state": "MERGED",
+      "author": "jhoyla",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-05-16T13:51:53Z",
+      "updatedAt": "2025-05-16T13:54:26Z",
+      "baseRepository": "yaroslavros/httpbis-secondary-client-certs",
+      "baseRefName": "main",
+      "baseRefOid": "92e0ca193749bfc9c06ed0494ed624fe2bd4069a",
+      "headRepository": "yaroslavros/httpbis-secondary-client-certs",
+      "headRefName": "jhoyla/add-author",
+      "headRefOid": "fc95ee034d38aa1d906c3699f6baa5bb4160f140",
+      "closedAt": "2025-05-16T13:54:26Z",
+      "mergedAt": "2025-05-16T13:54:26Z",
+      "mergedBy": "yaroslavros",
+      "mergeCommit": {
+        "oid": "e78fbaed6173de8fddb09813c6b4b51b193a3945"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
