@@ -6,27 +6,26 @@
 <meta content="initial-scale=1.0" name="viewport">
 <title>Secondary Certificate Authentication of HTTP Clients</title>
 <meta content="Yaroslav Rosomakho" name="author">
-<meta content="Jonathan Hoyland" name="author">
 <meta content="
        This document defines a mechanism for HTTP/2 and HTTP/3 clients to provide additional certificate-based credentials after the TLS handshake has completed, using TLS Exported Authenticators. Unlike traditional client authentication during the TLS handshake, this mechanism allows clients to present multiple certificates over the lifetime of a session. 
     " name="description">
-<meta content="xml2rfc 3.28.1" name="generator">
+<meta content="xml2rfc 3.29.0" name="generator">
 <meta content="exported authenticators" name="keyword">
 <meta content="masque" name="keyword">
 <meta content="draft-rosomakho-httpbis-secondary-client-certs-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.28.1
-    Python 3.12.10
+  xml2rfc 3.29.0
+    Python 3.12.11
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
-    lxml 5.3.0
-    platformdirs 4.3.7
+    lxml 5.3.1
+    platformdirs 4.3.8
     pycountry 24.6.1
     PyYAML 6.0.2
-    requests 2.32.3
-    setuptools 70.3.0
+    requests 2.32.4
+    setuptools 80.9.0
     wcwidth 0.2.13
 -->
 <link href="draft-rosomakho-httpbis-secondary-client-certs.xml" rel="alternate" type="application/rfc+xml">
@@ -1046,11 +1045,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Secondary Clients Certificates</td>
-<td class="right">May 2025</td>
+<td class="right">June 2025</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Rosomakho &amp; Hoyland</td>
-<td class="center">Expires 17 November 2025</td>
+<td class="left">Rosomakho</td>
+<td class="center">Expires 31 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,21 +1062,17 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-rosomakho-httpbis-secondary-client-certs-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-05-16" class="published">16 May 2025</time>
+<time datetime="2025-06-29" class="published">29 June 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-11-17">17 November 2025</time></dd>
-<dt class="label-authors">Authors:</dt>
+<dd class="expires"><time datetime="2025-12-31">31 December 2025</time></dd>
+<dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
       <div class="author-name">Y. Rosomakho</div>
 <div class="org">Zscaler</div>
-</div>
-<div class="author">
-      <div class="author-name">J. Hoyland</div>
-<div class="org">Cloudflare</div>
 </div>
 </dd>
 </dl>
@@ -1121,7 +1116,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 17 November 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 31 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1181,10 +1176,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-client-request-for-server-a" class="internal xref">Client Request for Server Authenticators</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-authentication-procedure" class="internal xref">Authentication Procedure</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
-                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-request_client_auth-frame" class="internal xref">REQUEST_CLIENT_AUTH Frame</a></p>
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-authenticator_requests-fram" class="internal xref">AUTHENTICATOR_REQUESTS Frame</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.1">
                     <p id="section-toc.1-1.4.2.1.2.1.1"><a href="#section-4.1.1" class="auto internal xref">4.1.1</a>.  <a href="#name-http-2-definition-2" class="internal xref">HTTP/2 Definition</a></p>
@@ -1192,99 +1187,72 @@ svg :is([fill="white"], [fill^="#fff"]) {
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.2">
                     <p id="section-toc.1-1.4.2.1.2.2.1"><a href="#section-4.1.2" class="auto internal xref">4.1.2</a>.  <a href="#name-http-3-definition-2" class="internal xref">HTTP/3 Definition</a></p>
 </li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.3">
+                    <p id="section-toc.1-1.4.2.1.2.3.1"><a href="#section-4.1.3" class="auto internal xref">4.1.3</a>.  <a href="#name-authenticator-request-forma" class="internal xref">Authenticator Request Format</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.4">
+                    <p id="section-toc.1-1.4.2.1.2.4.1"><a href="#section-4.1.4" class="auto internal xref">4.1.4</a>.  <a href="#name-request-ordering-and-pacing" class="internal xref">Request Ordering and Pacing</a></p>
+</li>
                 </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
-                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-server-behavior-and-request" class="internal xref">Server Behavior and Request Handling</a></p>
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-certificate-frame" class="internal xref">CERTIFICATE Frame</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.1">
+                    <p id="section-toc.1-1.4.2.2.2.1.1"><a href="#section-4.2.1" class="auto internal xref">4.2.1</a>.  <a href="#name-certificate-validation-and-a" class="internal xref">Certificate Validation and Authorization</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-authentication-procedure" class="internal xref">Authentication Procedure</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-authenticator_requests-fram" class="internal xref">AUTHENTICATOR_REQUESTS Frame</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.1">
-                    <p id="section-toc.1-1.5.2.1.2.1.1"><a href="#section-5.1.1" class="auto internal xref">5.1.1</a>.  <a href="#name-http-2-definition-3" class="internal xref">HTTP/2 Definition</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.2">
-                    <p id="section-toc.1-1.5.2.1.2.2.1"><a href="#section-5.1.2" class="auto internal xref">5.1.2</a>.  <a href="#name-http-3-definition-3" class="internal xref">HTTP/3 Definition</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.3">
-                    <p id="section-toc.1-1.5.2.1.2.3.1"><a href="#section-5.1.3" class="auto internal xref">5.1.3</a>.  <a href="#name-authenticator-request-forma" class="internal xref">Authenticator Request Format</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1.2.4">
-                    <p id="section-toc.1-1.5.2.1.2.4.1"><a href="#section-5.1.4" class="auto internal xref">5.1.4</a>.  <a href="#name-request-ordering-and-pacing" class="internal xref">Request Ordering and Pacing</a></p>
-</li>
-                </ul>
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-impersonation-and-trust" class="internal xref">Impersonation and Trust</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-certificate-frame" class="internal xref">CERTIFICATE Frame</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2.2.1">
-                    <p id="section-toc.1-1.5.2.2.2.1.1"><a href="#section-5.2.1" class="auto internal xref">5.2.1</a>.  <a href="#name-certificate-validation-and-a" class="internal xref">Certificate Validation and Authorization</a></p>
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-replay-prevention" class="internal xref">Replay Prevention</a></p>
 </li>
-                </ul>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-exposure-of-client-identity" class="internal xref">Exposure of Client Identity</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-binding-to-the-connection" class="internal xref">Binding to the Connection</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.5">
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="auto internal xref">5.5</a>.  <a href="#name-denial-of-service-risk" class="internal xref">Denial-of-Service Risk</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.6">
+                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="auto internal xref">5.6</a>.  <a href="#name-timing-side-channels" class="internal xref">Timing Side Channels</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-impersonation-and-trust" class="internal xref">Impersonation and Trust</a></p>
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-http-2-frame-types" class="internal xref">HTTP/2 Frame Types</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-replay-prevention" class="internal xref">Replay Prevention</a></p>
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-http-3-frame-types" class="internal xref">HTTP/3 Frame Types</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-exposure-of-client-identity" class="internal xref">Exposure of Client Identity</a></p>
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-http-2-setting" class="internal xref">HTTP/2 Setting</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
-                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-binding-to-the-connection" class="internal xref">Binding to the Connection</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.5">
-                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="auto internal xref">6.5</a>.  <a href="#name-denial-of-service-risk" class="internal xref">Denial-of-Service Risk</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.6">
-                <p id="section-toc.1-1.6.2.6.1"><a href="#section-6.6" class="auto internal xref">6.6</a>.  <a href="#name-timing-side-channels" class="internal xref">Timing Side Channels</a></p>
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-http-3-setting" class="internal xref">HTTP/3 Setting</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-http-2-frame-types" class="internal xref">HTTP/2 Frame Types</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-http-3-frame-types" class="internal xref">HTTP/3 Frame Types</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-http-2-setting" class="internal xref">HTTP/2 Setting</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
-                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-http-3-setting" class="internal xref">HTTP/3 Setting</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-references" class="internal xref">References</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
-                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
-                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1304,16 +1272,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
         <h3 id="name-authentication-initiation">
 <a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-authentication-initiation" class="section-name selfRef">Authentication Initiation</a>
         </h3>
-<p id="section-1.1-1">Client authentication using this mechanism can be initiated by either the client or the server:<a href="#section-1.1-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-1.1-2.1">
-            <p id="section-1.1-2.1.1">A client-initiated authentication begins with the client sending an <code>REQUEST_CLIENT_AUTH</code> frame. This signals its intent to provide certificate-based credentials and requests one or more challenge contexts from the server.<a href="#section-1.1-2.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-1.1-2.2">
-            <p id="section-1.1-2.2.1">A server-initiated authentication begins with the server sending an <code>AUTHENTICATOR_REQUESTS</code> frame unsolicited. This allows the server to request client credentials proactively.<a href="#section-1.1-2.2.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<p id="section-1.1-3">In both cases, the server provides a set of authenticator request contexts using the <code>AUTHENTICATOR_REQUESTS</code> frame. The client replies with one or more <code>CERTIFICATE</code> frames, each containing an Exported Authenticator constructed using one of the received contexts.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+<p id="section-1.1-1">Client authentication is initiated by the server once both peers have negotiated support for this mechanism.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">The client signals support and the maximum number of certificate-based credentials it is expecting to provide during the lifetime of the connection using HTTP/2 or HTTP/3 <code>SETTINGS</code> parameters. The server may request client credentials by sending an <code>AUTHENTICATOR_REQUESTS</code> frame, and the client responds with a sequence of <code>CERTIFICATE</code> frames, each containing an Exported Authenticator.<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+<p id="section-1.1-3">The server may initiate additional authentication exchanges later in the connection, provided the total number of requested credentials does not exceed the client's declared limit.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="certificate-validation-and-authorization">
@@ -1321,7 +1282,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         <h3 id="name-certificate-validation-and-">
 <a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-certificate-validation-and-" class="section-name selfRef">Certificate Validation and Authorization</a>
         </h3>
-<p id="section-1.2-1">This protocol does not define certificate validation or access control policies. The interpretation and acceptance of client-provided certificates are delegated entirely to the application.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<p id="section-1.2-1">Client authentication using this mechanism is initiated by the server in response to the client's advertised support.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
 <p id="section-1.2-2">Servers are expected to evaluate the received credentials according to their policy and decide whether to:<a href="#section-1.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1.2-3.1">
@@ -1355,16 +1316,18 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       <h2 id="name-negotiating-support-for-htt">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-negotiating-support-for-htt" class="section-name selfRef">Negotiating Support for HTTP-layer Client Certificate Authentication</a>
       </h2>
-<p id="section-3-1">Support for HTTP-layer client certificate authentication is negotiated via a <code>SETTINGS</code> parameter. An endpoint <span class="bcp14">MUST NOT</span> send frames related to client authentication (<code>REQUEST_CLIENT_AUTH</code>, <code>AUTHENTICATOR_REQUESTS</code>, or client-initiated <code>CERTIFICATE</code>) unless the peer has explicitly advertised support via the <code>SETTINGS</code> parameter defined in <a href="#settings-http-client-cert-auth" class="auto internal xref">Section 3.1</a>.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">Support for HTTP-layer client certificate authentication is negotiated via a <code>SETTINGS</code> parameter. An endpoint <span class="bcp14">MUST NOT</span> send frames related to client authentication (<code>AUTHENTICATOR_REQUESTS</code>, or client-initiated <code>CERTIFICATE</code>) unless the peer has explicitly advertised support via the <code>SETTINGS</code> parameter defined in <a href="#settings-http-client-cert-auth" class="auto internal xref">Section 3.1</a>.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">This restriction does not apply to server-initiated <code>CERTIFICATE</code> frames, which are governed by <span>[<a href="#SECONDARY-SERVER" class="cite xref">SECONDARY-SERVER</a>]</span>.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <div id="settings-http-client-cert-auth">
 <section id="section-3.1">
         <h3 id="name-settings_http_client_cert_a">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-settings_http_client_cert_a" class="section-name selfRef">SETTINGS_HTTP_CLIENT_CERT_AUTH</a>
         </h3>
-<p id="section-3.1-1">A new <code>SETTINGS</code> parameter is defined for both HTTP/2 and HTTP/3 to indicate support for HTTP-layer client certificate authentication. The value of this parameter <span class="bcp14">MUST</span> be either 0 or 1.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
-<p id="section-3.1-2">Each endpoint must advertise its own support. A client <span class="bcp14">MUST NOT</span> send <code>REQUEST_CLIENT_AUTH</code> or <code>CERTIFICATE</code> frames unless both parties have advertised support for this mechanism. Similarly, a server <span class="bcp14">MUST NOT</span> send an <code>AUTHENTICATOR_REQUESTS</code> frame unless both parties have advertised support.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
-<p id="section-3.1-3">Endpoints <span class="bcp14">MUST NOT</span> send a <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> parameter with a value of 0 after previously sending a value of 1. Once support for this extension has been advertised, it is considered enabled for the lifetime of the connection.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">A new <code>SETTINGS</code> parameter is defined for both HTTP/2 and HTTP/3 to indicate support for HTTP-layer client certificate authentication.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">Clients use this parameter to advertise the maximum number of certificate-based credentials they are expecting to provide during the lifetime of the connection. This value <span class="bcp14">MUST</span> be a non-zero integer. A value of zero indicates that the client does not support client certificate authentication.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">Servers that support this mechanism <span class="bcp14">MUST</span> respond with a value of 1 to confirm support. The server's value does not affect the number of authenticator requests it can send; it merely confirms participation in the protocol.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">Each endpoint must advertise its own support. A client <span class="bcp14">MUST NOT</span> send <code>CERTIFICATE</code> frames unless both parties have advertised support for this mechanism. Similarly, a server <span class="bcp14">MUST NOT</span> send an <code>AUTHENTICATOR_REQUESTS</code> frame unless both parties have advertised support.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.1-5">Endpoints <span class="bcp14">MUST NOT</span> send a <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> parameter with a value of 0 after previously sending a value greater than 0. Once support for this extension has been advertised, it is considered enabled for the lifetime of the connection.<a href="#section-3.1-5" class="pilcrow">¶</a></p>
 <div id="http2-definition">
 <section id="section-3.1.1">
           <h4 id="name-http-2-definition">
@@ -1376,7 +1339,10 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
               <p id="section-3.1.1-2.1.1">Identifier: <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> (0xTBD)<a href="#section-3.1.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.1.1-2.2">
-              <p id="section-3.1.1-2.2.1">Value: 0 indicates that the sender does not support this extension; 1 indicates support for receiving client certificate authentication frames.<a href="#section-3.1.1-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-3.1.1-2.2.1">Value set by clients: A positive integer indicating the number of credentials they are willing to provide.<a href="#section-3.1.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.1.1-2.3">
+              <p id="section-3.1.1-2.3.1">Value set by servers: 1 to indicate support.<a href="#section-3.1.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>
@@ -1392,7 +1358,10 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
               <p id="section-3.1.2-2.1.1">Identifier: <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> (0xTBD)<a href="#section-3.1.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.1.2-2.2">
-              <p id="section-3.1.2-2.2.1">Value: 0 indicates no support; 1 indicates support.<a href="#section-3.1.2-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-3.1.2-2.2.1">Value set by clients: A positive integer indicating the number of credentials they are willing to provide.<a href="#section-3.1.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.1.2-2.3">
+              <p id="section-3.1.2-2.3.1">Value set by servers: 1 to indicate support.<a href="#section-3.1.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </section>
@@ -1401,31 +1370,34 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 </div>
 </section>
 </div>
-<div id="client-request-for-server-authenticators">
+<div id="authentication-procedure">
 <section id="section-4">
-      <h2 id="name-client-request-for-server-a">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-client-request-for-server-a" class="section-name selfRef">Client Request for Server Authenticators</a>
+      <h2 id="name-authentication-procedure">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-authentication-procedure" class="section-name selfRef">Authentication Procedure</a>
       </h2>
-<p id="section-4-1">When a client wishes to initiate HTTP-layer certificate authentication, it begins by sending an <code>REQUEST_CLIENT_AUTH</code> frame. This frame signals the client's intent to provide one or more certificates and asks the server to generate a corresponding number of authenticator request contexts, which are returned in an <code>AUTHENTICATOR_REQUESTS</code> frame.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">A client <span class="bcp14">MUST NOT</span> send an <code>REQUEST_CLIENT_AUTH</code> frame unless both endpoints have negotiated support for the HTTP-layer client certificate authentication mechanism via the <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> parameter as described in <a href="#settings-http-client-cert-auth" class="auto internal xref">Section 3.1</a>.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">If a server receives an <code>REQUEST_CLIENT_AUTH</code> frame and has not negotiated this extension, it <span class="bcp14">MUST</span> treat the event as a connection error. In HTTP/3, the connection <span class="bcp14">MUST</span> be closed with an <code>H3_FRAME_UNEXPECTED</code> error according to <span><a href="https://rfc-editor.org/rfc/rfc9114#section-8" class="relref">Section 8</a> of [<a href="#H3" class="cite xref">HTTP/3</a>]</span>. In HTTP/2, the connection <span class="bcp14">MUST</span> be closed with a <code>PROTOCOL_ERROR</code> according to <span><a href="https://rfc-editor.org/rfc/rfc9113#section-5.4.1" class="relref">Section 5.4.1</a> of [<a href="#H2" class="cite xref">HTTP/2</a>]</span>.<a href="#section-4-3" class="pilcrow">¶</a></p>
-<div id="requestclientauth-frame">
+<p id="section-4-1">Once both endpoints have negotiated support for HTTP-layer client certificate authentication via <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> as described in <a href="#settings-http-client-cert-auth" class="auto internal xref">Section 3.1</a>), the server may initiate client authentication at any time by sending an <code>AUTHENTICATOR_REQUESTS</code> frame.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">The <code>AUTHENTICATOR_REQUESTS</code> frame contains a list of authenticator requests, as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-4" class="relref">Section 4</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>. Each request presents a cryptographic challenge for the client to use in the construction of a corresponding Exported Authenticator.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">The client <span class="bcp14">MAY</span> use provided authenticator requests to send <code>CERTIFICATE</code> frames. Each <code>CERTIFICATE</code> frame carries an Exported Authenticator that includes a certificate chain and proof of possession, as specified in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-5" class="relref">Section 5</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>. A client <span class="bcp14">MAY</span> send an empty authenticator as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-6" class="relref">Section 6</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span> in cases where it declines to authenticate for a given request.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">This section defines the structure of the <code>AUTHENTICATOR_REQUESTS</code> frame and outlines how it and the <code>CERTIFICATE</code> frames, as defined in <span>[<a href="#SECONDARY-SERVER" class="cite xref">SECONDARY-SERVER</a>]</span>, are exchanged, ordered, and validated during the authentication process.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<div id="authenticator-requests">
 <section id="section-4.1">
-        <h3 id="name-request_client_auth-frame">
-<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-request_client_auth-frame" class="section-name selfRef">REQUEST_CLIENT_AUTH Frame</a>
+        <h3 id="name-authenticator_requests-fram">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-authenticator_requests-fram" class="section-name selfRef">AUTHENTICATOR_REQUESTS Frame</a>
         </h3>
-<p id="section-4.1-1">The <code>REQUEST_CLIENT_AUTH</code> frame is used by a client to request one or more authenticator request contexts from the server. This frame is only valid if both endpoints have negotiated support for HTTP-layer client certificate authentication.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
-<p id="section-4.1-2">This frame is used exclusively by clients and is considered a control frame. Its format and transport differ depending on the HTTP version in use.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-1">The <code>AUTHENTICATOR_REQUESTS</code> frame is sent by the server to deliver authenticator requests to the client. It may be sent at any point after the client has advertised support via the <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> parameter.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1-2">The server <span class="bcp14">MAY</span> send multiple <code>AUTHENTICATOR_REQUESTS</code> frames over the lifetime of the connection. However, the total number of outstanding authenticator requests (those for which the client has not yet responded with a <code>CERTIFICATE</code> frame) <span class="bcp14">MUST NOT</span> exceed the maximum specified by the client in its <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> parameter. If this limit is exceeded, the client <span class="bcp14">MUST</span> treat it as a connection error.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1-3">The server <span class="bcp14">MAY</span> send additional <code>AUTHENTICATOR_REQUESTS</code> frames after receiving one or more <code>CERTIFICATE</code> frames from the client, in order to replenish the client's pool of active challenges. This allows the server to control the pace of client authentication while adhering to the negotiated limits.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">The list of authenticator requests in <code>AUTHENTICATOR_REQUESTS</code> frame <span class="bcp14">MUST NOT</span> be empty.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">Each authenticator request is used by the client to construct an Exported Authenticator as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-5" class="relref">Section 5</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>. This frame is a control frame and <span class="bcp14">MUST</span> be sent on stream 0 in HTTP/2 or the control stream in HTTP/3.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
 <div id="http2-definition-1">
 <section id="section-4.1.1">
           <h4 id="name-http-2-definition-2">
 <a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-http-2-definition-2" class="section-name selfRef">HTTP/2 Definition</a>
           </h4>
-<p id="section-4.1.1-1">The <code>REQUEST_CLIENT_AUTH</code> frame is sent on stream 0.<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
-<span id="name-http-2-request_client_auth-"></span><figure id="figure-1">
-            <div class="alignLeft art-ascii-art art-text artwork" id="section-4.1.1-2.1">
+<span id="name-http-2-authenticator_reques"></span><figure id="figure-1">
+            <div class="alignLeft art-ascii-art art-text artwork" id="section-4.1.1-1.1">
 <pre>
-REQUEST_CLIENT_AUTH Frame {
+AUTHENTICATOR_REQUESTS Frame {
   Length (24),
   Type (8) = 0xTBD,
   Unused Flags (8),
@@ -1433,16 +1405,15 @@ REQUEST_CLIENT_AUTH Frame {
   Reserved (1),
   Stream Identifier (31) = 0,
 
-  Authenticator Count (i),
+  Authenticator Request (..) ...,
 }
 </pre>
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
-<a href="#name-http-2-request_client_auth-" class="selfRef">HTTP/2 REQUEST_CLIENT_AUTH Frame</a>
+<a href="#name-http-2-authenticator_reques" class="selfRef">HTTP/2 AUTHENTICATOR_REQUESTS Frame</a>
             </figcaption></figure>
-<p id="section-4.1.1-3">The <code>Authenticator Count</code> field is a variable-length integer that specifies how many authenticator request contexts the client is prepared to respond to. The value of this field <span class="bcp14">MUST</span> be greater than zero. Variable-length integers are encoded as described in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-4">If the server receives an <code>REQUEST_CLIENT_AUTH</code> frame with a Authenticator Count set to zero, it <span class="bcp14">MUST</span> treat it as a connection error of type <code>PROTOCOL_ERROR</code> according to <span><a href="https://rfc-editor.org/rfc/rfc9113#section-5.4.1" class="relref">Section 5.4.1</a> of [<a href="#H2" class="cite xref">HTTP/2</a>]</span>.<a href="#section-4.1.1-4" class="pilcrow">¶</a></p>
-<p id="section-4.1.1-5">If this frame is received on a stream other than stream 0, the recipient <span class="bcp14">MUST</span> treat it as a connection error of type <code>PROTOCOL_ERROR</code>.<a href="#section-4.1.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-2">If this frame is received by a server on any stream, or by a client on a stream other than stream 0, the recipient <span class="bcp14">MUST</span> treat it as a connection error of type <code>PROTOCOL_ERROR</code> according to <span><a href="https://rfc-editor.org/rfc/rfc9113#section-5.4.1" class="relref">Section 5.4.1</a> of [<a href="#H2" class="cite xref">HTTP/2</a>]</span>.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-3">If the frame payload is malformed or contains malformed authenticator requests (e.g., incomplete length-prefixes or invalid encoding), the recipient <span class="bcp14">MUST</span> treat it as a connection error of type <code>PROTOCOL_ERROR</code>.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="http3-definition-1">
@@ -1450,124 +1421,32 @@ REQUEST_CLIENT_AUTH Frame {
           <h4 id="name-http-3-definition-2">
 <a href="#section-4.1.2" class="section-number selfRef">4.1.2. </a><a href="#name-http-3-definition-2" class="section-name selfRef">HTTP/3 Definition</a>
           </h4>
-<p id="section-4.1.2-1">The <code>REQUEST_CLIENT_AUTH</code> frame is sent on the control stream.<a href="#section-4.1.2-1" class="pilcrow">¶</a></p>
-<span id="name-http-3-request_client_auth-"></span><figure id="figure-2">
-            <div class="alignLeft art-ascii-art art-text artwork" id="section-4.1.2-2.1">
+<span id="name-http-3-authenticator_reques"></span><figure id="figure-2">
+            <div class="alignLeft art-ascii-art art-text artwork" id="section-4.1.2-1.1">
 <pre>
-REQUEST_CLIENT_AUTH Frame {
-  Length (i),
+AUTHENTICATOR_REQUESTS Frame {
   Type (i) = 0xTBD,
+  Length (i),
 
-  Authenticator Count (i),
+  Authenticator Request (..) ...,
 }
 </pre>
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
-<a href="#name-http-3-request_client_auth-" class="selfRef">HTTP/3 REQUEST_CLIENT_AUTH Frame</a>
-            </figcaption></figure>
-<p id="section-4.1.2-3">The Authenticator Count field is a variable-length integer that specifies how many authenticator request contexts the client is prepared to respond to. The value of this field <span class="bcp14">MUST</span> be greater than zero. Variable-length integers are encoded as described in <span><a href="https://rfc-editor.org/rfc/rfc9000#section-16" class="relref">Section 16</a> of [<a href="#QUIC" class="cite xref">QUIC</a>]</span>.<a href="#section-4.1.2-3" class="pilcrow">¶</a></p>
-<p id="section-4.1.2-4">If the server receives an <code>REQUEST_CLIENT_AUTH</code> frame with a Authenticator Count set to zero, it <span class="bcp14">MUST</span> treat it as a connection error of type <code>H3_MESSAGE_ERROR</code> according to <span><a href="https://rfc-editor.org/rfc/rfc9114#section-8" class="relref">Section 8</a> of [<a href="#H3" class="cite xref">HTTP/3</a>]</span>.<a href="#section-4.1.2-4" class="pilcrow">¶</a></p>
-<p id="section-4.1.2-5">If this frame is received on a stream other than the control stream, the recipient <span class="bcp14">MUST</span> treat it as a connection error of type <code>H3_FRAME_UNEXPECTED</code>.<a href="#section-4.1.2-5" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="server-behavior-and-request-handling">
-<section id="section-4.2">
-        <h3 id="name-server-behavior-and-request">
-<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-server-behavior-and-request" class="section-name selfRef">Server Behavior and Request Handling</a>
-        </h3>
-<p id="section-4.2-1">Upon receiving an <code>REQUEST_CLIENT_AUTH</code> frame, the server <span class="bcp14">MUST</span> respond with an <code>AUTHENTICATOR_REQUESTS</code> frame (as defined in <a href="#authenticator-requests" class="auto internal xref">Section 5.1</a>). The <code>AUTHENTICATOR_REQUESTS</code> frame carries a list of authenticator requests that the client is expected to satisfy. This list <span class="bcp14">MAY</span> be empty.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2">If the server is not prepared to generate any authenticator requests, or does not wish to accept client certificate authentication at this time, it <span class="bcp14">MUST</span> respond with an <code>AUTHENTICATOR_REQUESTS</code> frame that contains an empty list of authenticators.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
-<p id="section-4.2-3">The server <span class="bcp14">MAY</span> include fewer authenticator requests than the number requested by the client. This allows the server to limit the state it must retain while waiting for the client to respond with corresponding <code>CERTIFICATE</code> frames.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
-<p id="section-4.2-4">A client <span class="bcp14">MUST NOT</span> send a new <code>REQUEST_CLIENT_AUTH</code> frame until all of the following conditions are met:<a href="#section-4.2-4" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-4.2-5.1">
-            <p id="section-4.2-5.1.1">It has received an <code>AUTHENTICATOR_REQUESTS</code> frame from the server in response to the previous request;<a href="#section-4.2-5.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-4.2-5.2">
-            <p id="section-4.2-5.2.1">It has sent a <code>CERTIFICATE</code> frame for each authenticator included in that response.<a href="#section-4.2-5.2.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<p id="section-4.2-6">If the server receives an <code>REQUEST_CLIENT_AUTH</code> frame that violates these conditions, such as being sent before the previous exchange has completed, it <span class="bcp14">MUST</span> treat this as a connection error. In HTTP/2, the server <span class="bcp14">MUST</span> terminate the connection with a <code>PROTOCOL_ERROR</code> according to <span><a href="https://rfc-editor.org/rfc/rfc9113#section-5.4.1" class="relref">Section 5.4.1</a> of [<a href="#H2" class="cite xref">HTTP/2</a>]</span>. In HTTP/3, it <span class="bcp14">MUST</span> terminate the connection with H3_FRAME_UNEXPECTED according to <span><a href="https://rfc-editor.org/rfc/rfc9114#section-8" class="relref">Section 8</a> of [<a href="#H3" class="cite xref">HTTP/3</a>]</span>.<a href="#section-4.2-6" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="authentication-procedure">
-<section id="section-5">
-      <h2 id="name-authentication-procedure">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-authentication-procedure" class="section-name selfRef">Authentication Procedure</a>
-      </h2>
-<p id="section-5-1">The authentication procedure begins when the server sends an <code>AUTHENTICATOR_REQUESTS</code> frame to the client. This may occur in response to a <code>REQUEST_CLIENT_AUTH</code> frame previously sent by the client, or independently, if the server wishes to initiate client authentication based on its own policy.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">The <code>AUTHENTICATOR_REQUESTS</code> frame contains a list of authenticator requests, as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-4" class="relref">Section 4</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>. Each request presents a cryptographic challenge for the client to use in the construction of a corresponding Exported Authenticator. The list of authenticator requests <span class="bcp14">MAY</span> be empty, indicating that the server is not currently accepting client authentication but acknowledges the <code>REQUEST_CLIENT_AUTH</code> request.<a href="#section-5-2" class="pilcrow">¶</a></p>
-<p id="section-5-3">The client responds by sending a <code>CERTIFICATE</code> frame for each authenticator request provided. Each <code>CERTIFICATE</code> frame carries an Exported Authenticator that includes a certificate chain and proof of possession, as specified in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-5" class="relref">Section 5</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>. A client may send an empty authenticator as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-6" class="relref">Section 6</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span> in cases where it declines to authenticate for a given request.<a href="#section-5-3" class="pilcrow">¶</a></p>
-<p id="section-5-4">This section defines the structure of the <code>AUTHENTICATOR_REQUESTS</code> frame and outlines how it and the <code>CERTIFICATE</code> frames, as defined in <span>[<a href="#SECONDARY-SERVER" class="cite xref">SECONDARY-SERVER</a>]</span>, are exchanged, ordered, and validated during the authentication process.<a href="#section-5-4" class="pilcrow">¶</a></p>
-<div id="authenticator-requests">
-<section id="section-5.1">
-        <h3 id="name-authenticator_requests-fram">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-authenticator_requests-fram" class="section-name selfRef">AUTHENTICATOR_REQUESTS Frame</a>
-        </h3>
-<p id="section-5.1-1">The <code>AUTHENTICATOR_REQUESTS</code> frame is sent by the server to deliver authenticator requests to the client. It may be used in response to a <code>REQUEST_CLIENT_AUTH</code> frame or sent independently. The list of authenticator requests <span class="bcp14">MAY</span> be empty, in which case the frame serves to acknowledge the client's request without initiating authentication.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">Each authenticator request is used by the client to construct an Exported Authenticator as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-5" class="relref">Section 5</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>. This frame is sent only after support for HTTP-layer client certificate authentication has been negotiated via <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> as described in <a href="#settings-http-client-cert-auth" class="auto internal xref">Section 3.1</a>. It is a control frame and <span class="bcp14">MUST</span> be sent on stream 0 in HTTP/2 or the control stream in HTTP/3.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<div id="http2-definition-2">
-<section id="section-5.1.1">
-          <h4 id="name-http-2-definition-3">
-<a href="#section-5.1.1" class="section-number selfRef">5.1.1. </a><a href="#name-http-2-definition-3" class="section-name selfRef">HTTP/2 Definition</a>
-          </h4>
-<span id="name-http-2-authenticator_reques"></span><figure id="figure-3">
-            <div class="alignLeft art-ascii-art art-text artwork" id="section-5.1.1-1.1">
-<pre>
-AUTHENTICATOR_REQUESTS Frame {
-  Length (24),
-  Type (8) = 0xTBD,
-  Unused Flags (8),
-
-  Reserved (1),
-  Stream Identifier (31) = 0,
-
-  Authenticator Request (..) ...,
-}
-</pre>
-</div>
-<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
-<a href="#name-http-2-authenticator_reques" class="selfRef">HTTP/2 AUTHENTICATOR_REQUESTS Frame</a>
-            </figcaption></figure>
-<p id="section-5.1.1-2">If this frame is received by a server on any stream, or by a client on a stream other than stream 0, the recipient <span class="bcp14">MUST</span> treat it as a connection error of type <code>PROTOCOL_ERROR</code> according to <span><a href="https://rfc-editor.org/rfc/rfc9113#section-5.4.1" class="relref">Section 5.4.1</a> of [<a href="#H2" class="cite xref">HTTP/2</a>]</span>.<a href="#section-5.1.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1.1-3">If the frame payload is malformed or contains malformed authenticator requests (e.g., incomplete length-prefixes or invalid encoding), the recipient <span class="bcp14">MUST</span> treat it as a connection error of type <code>PROTOCOL_ERROR</code>.<a href="#section-5.1.1-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="http3-definition-2">
-<section id="section-5.1.2">
-          <h4 id="name-http-3-definition-3">
-<a href="#section-5.1.2" class="section-number selfRef">5.1.2. </a><a href="#name-http-3-definition-3" class="section-name selfRef">HTTP/3 Definition</a>
-          </h4>
-<span id="name-http-3-authenticator_reques"></span><figure id="figure-4">
-            <div class="alignLeft art-ascii-art art-text artwork" id="section-5.1.2-1.1">
-<pre>
-AUTHENTICATOR_REQUESTS Frame {
-  Type (i) = 0xTBD,
-  Length (i),
-
-  Authenticator Request (..) ...,
-}
-</pre>
-</div>
-<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
 <a href="#name-http-3-authenticator_reques" class="selfRef">HTTP/3 AUTHENTICATOR_REQUESTS Frame</a>
             </figcaption></figure>
-<p id="section-5.1.2-2">If this frame is received by a server on any stream, or by a client on a stream other than the control stream, the recipient <span class="bcp14">MUST</span> treat it as a connection error of type <code>H3_FRAME_UNEXPECTED</code> according to <span><a href="https://rfc-editor.org/rfc/rfc9114#section-8" class="relref">Section 8</a> of [<a href="#H3" class="cite xref">HTTP/3</a>]</span>.<a href="#section-5.1.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.1.2-3">If the frame payload is malformed or contains malformed authenticator requests, the recipient <span class="bcp14">MUST</span> treat it as a connection error of type <code>H3_MESSAGE_ERROR</code>.<a href="#section-5.1.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-2">If this frame is received by a server on any stream, or by a client on a stream other than the control stream, the recipient <span class="bcp14">MUST</span> treat it as a connection error of type <code>H3_FRAME_UNEXPECTED</code> according to <span><a href="https://rfc-editor.org/rfc/rfc9114#section-8" class="relref">Section 8</a> of [<a href="#H3" class="cite xref">HTTP/3</a>]</span>.<a href="#section-4.1.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.2-3">If the frame payload is malformed or contains malformed authenticator requests, the recipient <span class="bcp14">MUST</span> treat it as a connection error of type <code>H3_MESSAGE_ERROR</code>.<a href="#section-4.1.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authenticator-request-format">
-<section id="section-5.1.3">
+<section id="section-4.1.3">
           <h4 id="name-authenticator-request-forma">
-<a href="#section-5.1.3" class="section-number selfRef">5.1.3. </a><a href="#name-authenticator-request-forma" class="section-name selfRef">Authenticator Request Format</a>
+<a href="#section-4.1.3" class="section-number selfRef">4.1.3. </a><a href="#name-authenticator-request-forma" class="section-name selfRef">Authenticator Request Format</a>
           </h4>
-<p id="section-5.1.3-1">Each Authenticator Request is an encoded structure consisting of a variable-length integer length and the corresponding binary value of the request:<a href="#section-5.1.3-1" class="pilcrow">¶</a></p>
-<span id="name-authenticator-request-struc"></span><figure id="figure-5">
-            <div class="alignLeft art-ascii-art art-text artwork" id="section-5.1.3-2.1">
+<p id="section-4.1.3-1">Each Authenticator Request is an encoded structure consisting of a variable-length integer length and the corresponding binary value of the request:<a href="#section-4.1.3-1" class="pilcrow">¶</a></p>
+<span id="name-authenticator-request-struc"></span><figure id="figure-3">
+            <div class="alignLeft art-ascii-art art-text artwork" id="section-4.1.3-2.1">
 <pre>
 Authenticator Request {
   Length (i),
@@ -1575,51 +1454,51 @@ Authenticator Request {
 }
 </pre>
 </div>
-<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
 <a href="#name-authenticator-request-struc" class="selfRef">Authenticator Request structure</a>
             </figcaption></figure>
 <ul class="normal">
-<li class="normal" id="section-5.1.3-3.1">
-              <p id="section-5.1.3-3.1.1">Length (i): A variable-length integer specifying the length, in bytes, of the ClientCertificateRequest.<a href="#section-5.1.3-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-4.1.3-3.1">
+              <p id="section-4.1.3-3.1.1">Length (i): A variable-length integer specifying the length, in bytes, of the ClientCertificateRequest.<a href="#section-4.1.3-3.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-5.1.3-3.2">
-              <p id="section-5.1.3-3.2.1">ClientCertificateRequest: A structure as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-4" class="relref">Section 4</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>.<a href="#section-5.1.3-3.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-4.1.3-3.2">
+              <p id="section-4.1.3-3.2.1">ClientCertificateRequest: A structure as defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-4" class="relref">Section 4</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>.<a href="#section-4.1.3-3.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-5.1.3-4">The payload of the <code>AUTHENTICATOR_REQUESTS</code> frame consists of a sequence of these Authenticator Request elements. The list <span class="bcp14">MAY</span> be empty. Clients parse the payload by reading the length, then interpreting the following bytes as a ClientCertificateRequest structure.<a href="#section-5.1.3-4" class="pilcrow">¶</a></p>
+<p id="section-4.1.3-4">The payload of the <code>AUTHENTICATOR_REQUESTS</code> frame consists of a sequence of these Authenticator Request elements. The list <span class="bcp14">MUST NOT</span> be empty. Clients parse the payload by reading the length, then interpreting the following bytes as a ClientCertificateRequest structure.<a href="#section-4.1.3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="request-ordering-and-pacing">
-<section id="section-5.1.4">
+<section id="section-4.1.4">
           <h4 id="name-request-ordering-and-pacing">
-<a href="#section-5.1.4" class="section-number selfRef">5.1.4. </a><a href="#name-request-ordering-and-pacing" class="section-name selfRef">Request Ordering and Pacing</a>
+<a href="#section-4.1.4" class="section-number selfRef">4.1.4. </a><a href="#name-request-ordering-and-pacing" class="section-name selfRef">Request Ordering and Pacing</a>
           </h4>
-<p id="section-5.1.4-1">Clients <span class="bcp14">MUST</span> respond to each authenticator request context with a corresponding <code>CERTIFICATE</code> frame, in the same order as the authenticator requests appeared in the <code>AUTHENTICATOR_REQUESTS</code> frame.<a href="#section-5.1.4-1" class="pilcrow">¶</a></p>
-<p id="section-5.1.4-2">A client <span class="bcp14">MUST NOT</span> accept a new <code>AUTHENTICATOR_REQUESTS</code> frame while a previous one is still outstanding. Specifically, if the client has received an <code>AUTHENTICATOR_REQUESTS</code> frame and has not yet sent a <code>CERTIFICATE</code> frame for each contained request, it <span class="bcp14">MUST</span> treat any additional <code>AUTHENTICATOR_REQUESTS</code> frame as a connection error.<a href="#section-5.1.4-2" class="pilcrow">¶</a></p>
-<p id="section-5.1.4-3">In HTTP/2, the connection <span class="bcp14">MUST</span> be closed with a PROTOCOL_ERROR according to <span><a href="https://rfc-editor.org/rfc/rfc9113#section-5.4.1" class="relref">Section 5.4.1</a> of [<a href="#H2" class="cite xref">HTTP/2</a>]</span>. In HTTP/3, the connection <span class="bcp14">MUST</span> be closed with <code>H3_FRAME_UNEXPECTED</code> according to <span><a href="https://rfc-editor.org/rfc/rfc9114#section-8" class="relref">Section 8</a> of [<a href="#H3" class="cite xref">HTTP/3</a>]</span>.<a href="#section-5.1.4-3" class="pilcrow">¶</a></p>
+<p id="section-4.1.4-1">Clients <span class="bcp14">MUST</span> respond to each authenticator request context with a corresponding <code>CERTIFICATE</code> frame, in the same order as the authenticator requests appeared in the <code>AUTHENTICATOR_REQUESTS</code> frame.<a href="#section-4.1.4-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.4-2">The total number of outstanding authenticator requests <span class="bcp14">MUST NOT</span> exceed the value the client advertised in the <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> parameter. If the server exceeds this limit, the client <span class="bcp14">MUST</span> treat it as a connection error.<a href="#section-4.1.4-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.4-3">In HTTP/2, the connection <span class="bcp14">MUST</span> be closed with a PROTOCOL_ERROR according to <span><a href="https://rfc-editor.org/rfc/rfc9113#section-5.4.1" class="relref">Section 5.4.1</a> of [<a href="#H2" class="cite xref">HTTP/2</a>]</span>. In HTTP/3, the connection <span class="bcp14">MUST</span> be closed with <code>H3_FRAME_UNEXPECTED</code> according to <span><a href="https://rfc-editor.org/rfc/rfc9114#section-8" class="relref">Section 8</a> of [<a href="#H3" class="cite xref">HTTP/3</a>]</span>.<a href="#section-4.1.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="certificate-frame">
-<section id="section-5.2">
+<section id="section-4.2">
         <h3 id="name-certificate-frame">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-certificate-frame" class="section-name selfRef">CERTIFICATE Frame</a>
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-certificate-frame" class="section-name selfRef">CERTIFICATE Frame</a>
         </h3>
-<p id="section-5.2-1">The <code>CERTIFICATE</code> frame is used by the client to respond to each authenticator request previously delivered by the server in an <code>AUTHENTICATOR_REQUESTS</code> frame. Each <code>CERTIFICATE</code> frame carries a single Exported Authenticator structure constructed using the TLS Exported Authenticator mechanism defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-5.2" class="relref">Section 5.2</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">The format and semantics of the <code>CERTIFICATE</code> frame are defined in <span>[<a href="#SECONDARY-SERVER" class="cite xref">SECONDARY-SERVER</a>]</span>, and are reused without modification for client authentication.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2-3">Clients <span class="bcp14">MUST</span> send exactly one <code>CERTIFICATE</code> frame for each authenticator request context received. These frames <span class="bcp14">MUST</span> be sent in the same order as the corresponding authenticator requests appeared in the <code>AUTHENTICATOR_REQUESTS</code> frame.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
-<p id="section-5.2-4">A <code>CERTIFICATE</code> frame <span class="bcp14">MAY</span> carry an empty authenticator, as described in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-6" class="relref">Section 6</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>. This allows the client to decline authentication for a particular request context without terminating the connection.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
-<p id="section-5.2-5">Clients <span class="bcp14">MUST NOT</span> send <code>CERTIFICATE</code> frames unless they are in response to an outstanding <code>AUTHENTICATOR_REQUESTS</code> frame. If a server receives a <code>CERTIFICATE</code> frame when no authenticator request is outstanding, it <span class="bcp14">MUST</span> treat this as a connection error.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
-<p id="section-5.2-6">Servers <span class="bcp14">MUST NOT</span> send <code>CERTIFICATE</code> frames unless the secondary certificate authentication mechanism for HTTP servers has been negotiated according to <span>[<a href="#SECONDARY-SERVER" class="cite xref">SECONDARY-SERVER</a>]</span>. If a client receives a server-generated <code>CERTIFICATE</code> frame without such negotiation, it <span class="bcp14">MUST</span> treat this as a connection error of type <code>PROTOCOL_ERROR</code> (HTTP/2) or <code>H3_FRAME_UNEXPECTED</code> (HTTP/3).<a href="#section-5.2-6" class="pilcrow">¶</a></p>
+<p id="section-4.2-1">The <code>CERTIFICATE</code> frame is used by the client to respond to each authenticator request previously delivered by the server in an <code>AUTHENTICATOR_REQUESTS</code> frame. Each <code>CERTIFICATE</code> frame carries a single Exported Authenticator structure constructed using the TLS Exported Authenticator mechanism defined in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-5.2" class="relref">Section 5.2</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">The format and semantics of the <code>CERTIFICATE</code> frame are defined in <span>[<a href="#SECONDARY-SERVER" class="cite xref">SECONDARY-SERVER</a>]</span>, and are reused without modification for client authentication.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3">Clients <span class="bcp14">MUST</span> send exactly one <code>CERTIFICATE</code> frame for each authenticator request context received. These frames <span class="bcp14">MUST</span> be sent in the same order as the corresponding authenticator requests appeared in the <code>AUTHENTICATOR_REQUESTS</code> frame.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-4">A <code>CERTIFICATE</code> frame <span class="bcp14">MAY</span> carry an empty authenticator, as described in <span><a href="https://rfc-editor.org/rfc/rfc9261#section-6" class="relref">Section 6</a> of [<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>. This allows the client to decline authentication for a particular request context without terminating the connection.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
+<p id="section-4.2-5">Clients <span class="bcp14">MUST NOT</span> send <code>CERTIFICATE</code> frames unless they are in response to an outstanding <code>AUTHENTICATOR_REQUESTS</code> frame. If a server receives a <code>CERTIFICATE</code> frame when no authenticator request is outstanding, it <span class="bcp14">MUST</span> treat this as a connection error.<a href="#section-4.2-5" class="pilcrow">¶</a></p>
+<p id="section-4.2-6">Servers <span class="bcp14">MUST NOT</span> send <code>CERTIFICATE</code> frames unless the secondary certificate authentication mechanism for HTTP servers has been negotiated according to <span>[<a href="#SECONDARY-SERVER" class="cite xref">SECONDARY-SERVER</a>]</span>. If a client receives a server-generated <code>CERTIFICATE</code> frame without such negotiation, it <span class="bcp14">MUST</span> treat this as a connection error of type <code>PROTOCOL_ERROR</code> (HTTP/2) or <code>H3_FRAME_UNEXPECTED</code> (HTTP/3).<a href="#section-4.2-6" class="pilcrow">¶</a></p>
 <div id="certificate-validation-and-authorization-1">
-<section id="section-5.2.1">
+<section id="section-4.2.1">
           <h4 id="name-certificate-validation-and-a">
-<a href="#section-5.2.1" class="section-number selfRef">5.2.1. </a><a href="#name-certificate-validation-and-a" class="section-name selfRef">Certificate Validation and Authorization</a>
+<a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-certificate-validation-and-a" class="section-name selfRef">Certificate Validation and Authorization</a>
           </h4>
-<p id="section-5.2.1-1">The validation of client-provided certificates and any associated authorization logic are outside the scope of this specification. The server is responsible for interpreting the <code>CERTIFICATE</code> frames it receives and deciding how they impact the session state or access control.<a href="#section-5.2.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-2">A server <span class="bcp14">MAY</span> associate an accepted certificate with the connection, use it for access control decisions on subsequent requests, or ignore it entirely. The application determines whether authentication is required, optional, or sufficient for specific operations.<a href="#section-5.2.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.2.1-3">If a server receives a certificate that it considers invalid, untrusted, or inappropriate, it <span class="bcp14">MAY</span> respond by limiting the client’s access, rejecting individual requests, or closing the connection. This specification does not define protocol-level error signaling for certificate rejection.<a href="#section-5.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-1">The validation of client-provided certificates and any associated authorization logic are outside the scope of this specification. The server is responsible for interpreting the <code>CERTIFICATE</code> frames it receives and deciding how they impact the session state or access control.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-2">A server <span class="bcp14">MAY</span> associate an accepted certificate with the connection, use it for access control decisions on subsequent requests, or ignore it entirely. The application determines whether authentication is required, optional, or sufficient for specific operations.<a href="#section-4.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-3">If a server receives a certificate that it considers invalid, untrusted, or inappropriate, it <span class="bcp14">MAY</span> respond by limiting the client’s access, rejecting individual requests, or closing the connection. This specification does not define protocol-level error signaling for certificate rejection.<a href="#section-4.2.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1627,272 +1506,216 @@ Authenticator Request {
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-6">
+<section id="section-5">
       <h2 id="name-security-considerations">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-6-1">This mechanism builds on TLS Exported Authenticators <span>[<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>, which provide cryptographic binding to the underlying TLS connection and strong guarantees of authenticity, integrity, and freshness. However, several considerations remain relevant for implementers and deployers.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-5-1">This mechanism builds on TLS Exported Authenticators <span>[<a href="#EXPORTED-AUTH" class="cite xref">EXPORTED-AUTH</a>]</span>, which provide cryptographic binding to the underlying TLS connection and strong guarantees of authenticity, integrity, and freshness. However, several considerations remain relevant for implementers and deployers.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <div id="impersonation-and-trust">
-<section id="section-6.1">
+<section id="section-5.1">
         <h3 id="name-impersonation-and-trust">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-impersonation-and-trust" class="section-name selfRef">Impersonation and Trust</a>
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-impersonation-and-trust" class="section-name selfRef">Impersonation and Trust</a>
         </h3>
-<p id="section-6.1-1">Servers <span class="bcp14">MUST</span> carefully validate client-provided certificates and ensure that they are trusted, appropriate for the context, and bound to the intended identity. Failure to enforce proper certificate validation could allow an attacker to impersonate another client or gain unauthorized access.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.1-2">Authorization decisions based on certificates are application-specific and must be handled with care. A certificate's presence does not imply entitlement.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-5.1-1">Servers <span class="bcp14">MUST</span> carefully validate client-provided certificates and ensure that they are trusted, appropriate for the context, and bound to the intended identity. Failure to enforce proper certificate validation could allow an attacker to impersonate another client or gain unauthorized access.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+<p id="section-5.1-2">Authorization decisions based on certificates are application-specific and must be handled with care. A certificate's presence does not imply entitlement.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="replay-prevention">
-<section id="section-6.2">
+<section id="section-5.2">
         <h3 id="name-replay-prevention">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-replay-prevention" class="section-name selfRef">Replay Prevention</a>
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-replay-prevention" class="section-name selfRef">Replay Prevention</a>
         </h3>
-<p id="section-6.2-1">Exported Authenticators are constructed using unique per-session cryptographic context and include binding to the TLS connection via the handshake transcript. This provides replay protection across different sessions, provided the ClientCertificateRequest includes a fresh context value. Reuse of identical request contexts across connections <span class="bcp14">SHOULD</span> be avoided.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">Exported Authenticators are constructed using unique per-session cryptographic context and include binding to the TLS connection via the handshake transcript. This provides replay protection across different sessions, provided the ClientCertificateRequest includes a fresh context value. Reuse of identical request contexts across connections <span class="bcp14">SHOULD</span> be avoided.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="exposure-of-client-identity">
-<section id="section-6.3">
+<section id="section-5.3">
         <h3 id="name-exposure-of-client-identity">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-exposure-of-client-identity" class="section-name selfRef">Exposure of Client Identity</a>
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-exposure-of-client-identity" class="section-name selfRef">Exposure of Client Identity</a>
         </h3>
-<p id="section-6.3-1">Certificates often contain long-lived identifiers (such as names, device serial numbers, or email addresses). When a client presents such certificates, it exposes identity information to the server. Clients should avoid presenting identifying certificates unless necessary for the resource or context being accessed.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<p id="section-6.3-2">If client authentication is not required, clients may prefer to respond with an empty Exported Authenticator.<a href="#section-6.3-2" class="pilcrow">¶</a></p>
+<p id="section-5.3-1">Certificates often contain long-lived identifiers (such as names, device serial numbers, or email addresses). When a client presents such certificates, it exposes identity information to the server. Clients should avoid presenting identifying certificates unless necessary for the resource or context being accessed.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-2">If client authentication is not required, clients may prefer to respond with an empty Exported Authenticator.<a href="#section-5.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="binding-to-the-connection">
-<section id="section-6.4">
+<section id="section-5.4">
         <h3 id="name-binding-to-the-connection">
-<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-binding-to-the-connection" class="section-name selfRef">Binding to the Connection</a>
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-binding-to-the-connection" class="section-name selfRef">Binding to the Connection</a>
         </h3>
-<p id="section-6.4-1">Exported Authenticators are cryptographically bound to the TLS session in which they are sent. A certificate authenticated using this mechanism applies to the entire HTTP connection and all streams within it. Servers <span class="bcp14">MUST NOT</span> assume that certificate-based identity can vary between streams on the same connection.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
-<p id="section-6.4-2">Applications <span class="bcp14">MUST</span> ensure that any authenticated identity is scoped to the connection lifetime, and not reused across connections unless explicitly permitted by policy.<a href="#section-6.4-2" class="pilcrow">¶</a></p>
+<p id="section-5.4-1">Exported Authenticators are cryptographically bound to the TLS session in which they are sent. A certificate authenticated using this mechanism applies to the entire HTTP connection and all streams within it. Servers <span class="bcp14">MUST NOT</span> assume that certificate-based identity can vary between streams on the same connection.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<p id="section-5.4-2">Applications <span class="bcp14">MUST</span> ensure that any authenticated identity is scoped to the connection lifetime, and not reused across connections unless explicitly permitted by policy.<a href="#section-5.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="denial-of-service-risk">
-<section id="section-6.5">
+<section id="section-5.5">
         <h3 id="name-denial-of-service-risk">
-<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-denial-of-service-risk" class="section-name selfRef">Denial-of-Service Risk</a>
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-denial-of-service-risk" class="section-name selfRef">Denial-of-Service Risk</a>
         </h3>
-<p id="section-6.5-1">The process of generating authenticator requests, tracking their state, and verifying the resulting authenticators can be computationally expensive for the server. A malicious or misbehaving client could send repeated or excessive <code>REQUEST_CLIENT_AUTH</code> frames to force the server to consume memory, perform cryptographic operations, or hold open authentication state.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
-<p id="section-6.5-2">Servers <span class="bcp14">SHOULD</span> apply limits on the number of authenticator requests they are willing to issue in response to a single request. Servers <span class="bcp14">MAY</span> respond with fewer <code>AUTHENTICATOR_REQUESTS</code> than requested or with an empty list. Implementations <span class="bcp14">SHOULD</span> bound memory and compute usage per connection to mitigate such attacks.<a href="#section-6.5-2" class="pilcrow">¶</a></p>
+<p id="section-5.5-1">The process of generating authenticator requests, tracking their state, and verifying the resulting authenticators can be computationally expensive for the server. A malicious or misbehaving client could send excessive <code>CERTIFICATE</code> frames to force the server to consume memory, perform cryptographic operations, or maintain authentication state unnecessarily.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-2">Servers <span class="bcp14">SHOULD</span> enforce limits on the number of authenticator requests they are willing to issue. Servers <span class="bcp14">MAY</span> respond with fewer Authenticator Requests than requested by the client or choose not to repelish consumed requests with new ones. Implementations <span class="bcp14">SHOULD</span> bound memory and compute usage per connection to mitigate such attacks.<a href="#section-5.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="timing-side-channels">
-<section id="section-6.6">
+<section id="section-5.6">
         <h3 id="name-timing-side-channels">
-<a href="#section-6.6" class="section-number selfRef">6.6. </a><a href="#name-timing-side-channels" class="section-name selfRef">Timing Side Channels</a>
+<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-timing-side-channels" class="section-name selfRef">Timing Side Channels</a>
         </h3>
-<p id="section-6.6-1">Applications should consider the potential for timing side channels in certificate validation and authenticator generation. Variations in processing time may reveal information about internal policies, trust anchors, or user behavior. Constant-time validation and randomized delays are potential mitigations in sensitive deployments.<a href="#section-6.6-1" class="pilcrow">¶</a></p>
+<p id="section-5.6-1">Applications should consider the potential for timing side channels in certificate validation and authenticator generation. Variations in processing time may reveal information about internal policies, trust anchors, or user behavior. Constant-time validation and randomized delays are potential mitigations in sensitive deployments.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-7">
+<section id="section-6">
       <h2 id="name-iana-considerations">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-7-1">This document registers the <code>REQUEST_CLIENT_AUTH</code> and <code>AUTHENTICATOR_REQUESTS</code> frame types and <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> for both <span>[<a href="#H2" class="cite xref">HTTP/2</a>]</span> and <span>[<a href="#H3" class="cite xref">HTTP/3</a>]</span>.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-6-1">This document registers the <code>AUTHENTICATOR_REQUESTS</code> frame type and <code>SETTINGS_HTTP_CLIENT_CERT_AUTH</code> for both <span>[<a href="#H2" class="cite xref">HTTP/2</a>]</span> and <span>[<a href="#H3" class="cite xref">HTTP/3</a>]</span>.<a href="#section-6-1" class="pilcrow">¶</a></p>
 <div id="http2-frame-types">
-<section id="section-7.1">
+<section id="section-6.1">
         <h3 id="name-http-2-frame-types">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-http-2-frame-types" class="section-name selfRef">HTTP/2 Frame Types</a>
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-http-2-frame-types" class="section-name selfRef">HTTP/2 Frame Types</a>
         </h3>
-<p id="section-7.1-1">This specification registers the following entries in the "HTTP/2 Frame Types" registry defined in <span>[<a href="#H2" class="cite xref">HTTP/2</a>]</span>:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.1-2"><code>REQUEST_CLIENT_AUTH</code> frame:<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-1">This specification registers the following entry in the "HTTP/2 Frame Types" registry defined in <span>[<a href="#H2" class="cite xref">HTTP/2</a>]</span>:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2"><code>AUTHENTICATOR_REQUESTS</code> frame:<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.1-3.1">
-            <p id="section-7.1-3.1.1">Code: 0xTBD<a href="#section-7.1-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.1-3.1">
+            <p id="section-6.1-3.1.1">Code: 0xTBD<a href="#section-6.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.1-3.2">
-            <p id="section-7.1-3.2.1">Frame Type: REQUEST_CLIENT_AUTH<a href="#section-7.1-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.1-3.2">
+            <p id="section-6.1-3.2.1">Frame Type: AUTHENTICATOR_REQUESTS<a href="#section-6.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.1-3.3">
-            <p id="section-7.1-3.3.1">Reference: This document<a href="#section-7.1-3.3.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<p id="section-7.1-4"><code>AUTHENTICATOR_REQUESTS</code> frame:<a href="#section-7.1-4" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-7.1-5.1">
-            <p id="section-7.1-5.1.1">Code: 0xTBD<a href="#section-7.1-5.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.1-5.2">
-            <p id="section-7.1-5.2.1">Frame Type: AUTHENTICATOR_REQUESTS<a href="#section-7.1-5.2.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.1-5.3">
-            <p id="section-7.1-5.3.1">Reference: This document<a href="#section-7.1-5.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.1-3.3">
+            <p id="section-6.1-3.3.1">Reference: This document<a href="#section-6.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
 </div>
 <div id="http3-frame-types">
-<section id="section-7.2">
+<section id="section-6.2">
         <h3 id="name-http-3-frame-types">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-http-3-frame-types" class="section-name selfRef">HTTP/3 Frame Types</a>
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-http-3-frame-types" class="section-name selfRef">HTTP/3 Frame Types</a>
         </h3>
-<p id="section-7.2-1">This specification registers the following entries in the "HTTP/3 Frame Types" registry defined in <span>[<a href="#H3" class="cite xref">HTTP/3</a>]</span>:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<p id="section-7.2-2"><code>REQUEST_CLIENT_AUTH</code> frame:<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-1">This specification registers the following entry in the "HTTP/3 Frame Types" registry defined in <span>[<a href="#H3" class="cite xref">HTTP/3</a>]</span>:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2"><code>AUTHENTICATOR_REQUESTS</code> frame:<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.2-3.1">
-            <p id="section-7.2-3.1.1">Value: 0xTBD<a href="#section-7.2-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.2-3.1">
+            <p id="section-6.2-3.1.1">Value: 0xTBD<a href="#section-6.2-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-3.2">
-            <p id="section-7.2-3.2.1">Frame Type: REQUEST_CLIENT_AUTH<a href="#section-7.2-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-3.2">
+            <p id="section-6.2-3.2.1">Frame Type: AUTHENTICATOR_REQUESTS<a href="#section-6.2-3.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-3.3">
-            <p id="section-7.2-3.3.1">Status: provisional (permanent if this document is approved)<a href="#section-7.2-3.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-3.3">
+            <p id="section-6.2-3.3.1">Status: provisional (permanent if this document is approved)<a href="#section-6.2-3.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-3.4">
-            <p id="section-7.2-3.4.1">Reference: This document<a href="#section-7.2-3.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-3.4">
+            <p id="section-6.2-3.4.1">Reference: This document<a href="#section-6.2-3.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-3.5">
-            <p id="section-7.2-3.5.1">Change Controller: Yaroslav Rosomakho (IETF if this document is approved)<a href="#section-7.2-3.5.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-3.5">
+            <p id="section-6.2-3.5.1">Change Controller: Yaroslav Rosomakho (IETF if this document is approved)<a href="#section-6.2-3.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-3.6">
-            <p id="section-7.2-3.6.1">Contact: yrosomakho@zscaler.com (HTTP_WG; HTTP working group; ietf-http-wg@w3.org if this document is approved)<a href="#section-7.2-3.6.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-3.6">
+            <p id="section-6.2-3.6.1">Contact: yrosomakho@zscaler.com (HTTP_WG; HTTP working group; ietf-http-wg@w3.org if this document is approved)<a href="#section-6.2-3.6.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-3.7">
-            <p id="section-7.2-3.7.1">Notes: None<a href="#section-7.2-3.7.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<p id="section-7.2-4"><code>AUTHENTICATOR_REQUESTS</code> frame:<a href="#section-7.2-4" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-7.2-5.1">
-            <p id="section-7.2-5.1.1">Value: 0xTBD<a href="#section-7.2-5.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.2-5.2">
-            <p id="section-7.2-5.2.1">Frame Type: AUTHENTICATOR_REQUESTS<a href="#section-7.2-5.2.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.2-5.3">
-            <p id="section-7.2-5.3.1">Status: provisional (permanent if this document is approved)<a href="#section-7.2-5.3.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.2-5.4">
-            <p id="section-7.2-5.4.1">Reference: This document<a href="#section-7.2-5.4.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.2-5.5">
-            <p id="section-7.2-5.5.1">Change Controller: Yaroslav Rosomakho (IETF if this document is approved)<a href="#section-7.2-5.5.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.2-5.6">
-            <p id="section-7.2-5.6.1">Contact: yrosomakho@zscaler.com (HTTP_WG; HTTP working group; ietf-http-wg@w3.org if this document is approved)<a href="#section-7.2-5.6.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.2-5.7">
-            <p id="section-7.2-5.7.1">Notes: None<a href="#section-7.2-5.7.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.2-3.7">
+            <p id="section-6.2-3.7.1">Notes: None<a href="#section-6.2-3.7.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
 </div>
 <div id="http2-setting">
-<section id="section-7.3">
+<section id="section-6.3">
         <h3 id="name-http-2-setting">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-http-2-setting" class="section-name selfRef">HTTP/2 Setting</a>
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-http-2-setting" class="section-name selfRef">HTTP/2 Setting</a>
         </h3>
-<p id="section-7.3-1">This specification registers the following entry in the "HTTP/2 Settings" registry defined in <span>[<a href="#H2" class="cite xref">HTTP/2</a>]</span>:<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.3-1">This specification registers the following entry in the "HTTP/2 Settings" registry defined in <span>[<a href="#H2" class="cite xref">HTTP/2</a>]</span>:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.3-2.1">
-            <p id="section-7.3-2.1.1">Code: 0xTBD<a href="#section-7.3-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.3-2.1">
+            <p id="section-6.3-2.1.1">Code: 0xTBD<a href="#section-6.3-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.3-2.2">
-            <p id="section-7.3-2.2.1">Name: SETTINGS_HTTP_CLIENT_CERT_AUTH<a href="#section-7.3-2.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.3-2.2">
+            <p id="section-6.3-2.2.1">Name: SETTINGS_HTTP_CLIENT_CERT_AUTH<a href="#section-6.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.3-2.3">
-            <p id="section-7.3-2.3.1">Initial Value: 0<a href="#section-7.3-2.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.3-2.3">
+            <p id="section-6.3-2.3.1">Initial Value: 0<a href="#section-6.3-2.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.3-2.4">
-            <p id="section-7.3-2.4.1">Reference: This document<a href="#section-7.3-2.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.3-2.4">
+            <p id="section-6.3-2.4.1">Reference: This document<a href="#section-6.3-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
 </div>
 <div id="http3-setting">
-<section id="section-7.4">
+<section id="section-6.4">
         <h3 id="name-http-3-setting">
-<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-http-3-setting" class="section-name selfRef">HTTP/3 Setting</a>
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-http-3-setting" class="section-name selfRef">HTTP/3 Setting</a>
         </h3>
-<p id="section-7.4-1">This specification registers the following entry in the "HTTP/3 Settings" registry defined in <span>[<a href="#H3" class="cite xref">HTTP/3</a>]</span>:<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-1">This specification registers the following entry in the "HTTP/3 Settings" registry defined in <span>[<a href="#H3" class="cite xref">HTTP/3</a>]</span>:<a href="#section-6.4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.4-2.1">
-            <p id="section-7.4-2.1.1">Code: 0xTBD<a href="#section-7.4-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6.4-2.1">
+            <p id="section-6.4-2.1.1">Code: 0xTBD<a href="#section-6.4-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.4-2.2">
-            <p id="section-7.4-2.2.1">Setting Name: SETTINGS_HTTP_CLIENT_CERT_AUTH<a href="#section-7.4-2.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.4-2.2">
+            <p id="section-6.4-2.2.1">Setting Name: SETTINGS_HTTP_CLIENT_CERT_AUTH<a href="#section-6.4-2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.4-2.3">
-            <p id="section-7.4-2.3.1">Default: 0<a href="#section-7.4-2.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.4-2.3">
+            <p id="section-6.4-2.3.1">Default: 0<a href="#section-6.4-2.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.4-2.4">
-            <p id="section-7.4-2.4.1">Status: provisional (permanent if this document is approved)<a href="#section-7.4-2.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.4-2.4">
+            <p id="section-6.4-2.4.1">Status: provisional (permanent if this document is approved)<a href="#section-6.4-2.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.4-2.5">
-            <p id="section-7.4-2.5.1">Reference: This document<a href="#section-7.4-2.5.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.4-2.5">
+            <p id="section-6.4-2.5.1">Reference: This document<a href="#section-6.4-2.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.4-2.6">
-            <p id="section-7.4-2.6.1">Change Controller: Yaroslav Rosomakho (IETF if this document is approved)<a href="#section-7.4-2.6.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.4-2.6">
+            <p id="section-6.4-2.6.1">Change Controller: Yaroslav Rosomakho (IETF if this document is approved)<a href="#section-6.4-2.6.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.4-2.7">
-            <p id="section-7.4-2.7.1">Contact: yrosomakho@zscaler.com (HTTP_WG; HTTP working group; ietf-http-wg@w3.org if this document is approved)<a href="#section-7.4-2.7.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.4-2.7">
+            <p id="section-6.4-2.7.1">Contact: yrosomakho@zscaler.com (HTTP_WG; HTTP working group; ietf-http-wg@w3.org if this document is approved)<a href="#section-6.4-2.7.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.4-2.8">
-            <p id="section-7.4-2.8.1">Notes: None<a href="#section-7.4-2.8.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-6.4-2.8">
+            <p id="section-6.4-2.8.1">Notes: None<a href="#section-6.4-2.8.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
 </div>
 </section>
 </div>
-<div id="sec-combined-references">
-<section id="section-8">
-      <h2 id="name-references">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-references" class="section-name selfRef">References</a>
-      </h2>
 <div id="sec-normative-references">
-<section id="section-8.1">
-        <h3 id="name-normative-references">
-<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
-        </h3>
+<section id="section-7">
+      <h2 id="name-normative-references">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      </h2>
 <dl class="references">
 <dt id="EXPORTED-AUTH">[EXPORTED-AUTH]</dt>
-        <dd>
+      <dd>
 <span class="refAuthor">Sullivan, N.</span>, <span class="refTitle">"Exported Authenticators in TLS"</span>, <span class="seriesInfo">RFC 9261</span>, <span class="seriesInfo">DOI 10.17487/RFC9261</span>, <time datetime="2022-07" class="refDate">July 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9261">https://www.rfc-editor.org/rfc/rfc9261</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="H2">[HTTP/2]</dt>
-        <dd>
+      <dd>
 <span class="refAuthor">Thomson, M., Ed.</span> and <span class="refAuthor">C. Benfield, Ed.</span>, <span class="refTitle">"HTTP/2"</span>, <span class="seriesInfo">RFC 9113</span>, <span class="seriesInfo">DOI 10.17487/RFC9113</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9113">https://www.rfc-editor.org/rfc/rfc9113</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="H3">[HTTP/3]</dt>
-        <dd>
+      <dd>
 <span class="refAuthor">Bishop, M., Ed.</span>, <span class="refTitle">"HTTP/3"</span>, <span class="seriesInfo">RFC 9114</span>, <span class="seriesInfo">DOI 10.17487/RFC9114</span>, <time datetime="2022-06" class="refDate">June 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9114">https://www.rfc-editor.org/rfc/rfc9114</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
-        <dd>
+      <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
-        <dd>
+      <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="SECONDARY-SERVER">[SECONDARY-SERVER]</dt>
-        <dd>
+      <dd>
 <span class="refAuthor">Gorbaty, E.</span> and <span class="refAuthor">M. Bishop</span>, <span class="refTitle">"Secondary Certificate Authentication of HTTP Servers"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-httpbis-secondary-server-certs-01</span>, <time datetime="2024-10-12" class="refDate">12 October 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-secondary-server-certs-01">https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-secondary-server-certs-01</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TLS">[TLS]</dt>
-      <dd>
+    <dd>
 <span class="refAuthor">Rescorla, E.</span>, <span class="refTitle">"The Transport Layer Security (TLS) Protocol Version 1.3"</span>, <span class="seriesInfo">RFC 8446</span>, <span class="seriesInfo">DOI 10.17487/RFC8446</span>, <time datetime="2018-08" class="refDate">August 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8446">https://www.rfc-editor.org/rfc/rfc8446</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
-</section>
-</div>
-<div id="sec-informative-references">
-<section id="section-8.2">
-        <h3 id="name-informative-references">
-<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
-        </h3>
-<dl class="references">
-<dt id="QUIC">[QUIC]</dt>
-      <dd>
-<span class="refAuthor">Iyengar, J., Ed.</span> and <span class="refAuthor">M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="seriesInfo">RFC 9000</span>, <span class="seriesInfo">DOI 10.17487/RFC9000</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-</dl>
-</section>
-</div>
 </section>
 </div>
 <div id="acknowledgments">
@@ -1905,8 +1728,8 @@ Authenticator Request {
 </div>
 <div id="authors-addresses">
 <section id="appendix-B">
-      <h2 id="name-authors-addresses">
-<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Yaroslav Rosomakho</span></div>
@@ -1914,14 +1737,6 @@ Authenticator Request {
 <div class="email">
 <span>Email:</span>
 <a href="mailto:yrosomakho@zscaler.com" class="email">yrosomakho@zscaler.com</a>
-</div>
-</address>
-<address class="vcard">
-        <div dir="auto" class="left"><span class="fn nameRole">Jonathan Hoyland</span></div>
-<div dir="auto" class="left"><span class="org">Cloudflare</span></div>
-<div class="email">
-<span>Email:</span>
-<a href="mailto:jonathan.hoyland@gmail.com" class="email">jonathan.hoyland@gmail.com</a>
 </div>
 </address>
 </section>
