@@ -62,16 +62,15 @@ This mechanism builds on and complements the secondary certificate support for H
 
 ## Authentication Initiation
 
-Client authentication using this mechanism can be initiated by either the client or the server:
+Client authentication is initiated by the server once both peers have negotiated support for this mechanism.
 
-- A client-initiated authentication begins with the client sending an `REQUEST_CLIENT_AUTH` frame. This signals its intent to provide certificate-based credentials and requests one or more challenge contexts from the server.
-- A server-initiated authentication begins with the server sending an `AUTHENTICATOR_REQUESTS` frame unsolicited. This allows the server to request client credentials proactively.
+The client signals support and the maximum number of certificate-based credentials it is expecting to provide during the lifetime of the connection using HTTP/2 or HTTP/3 `SETTINGS` parameters. The server may request client credentials by sending an `AUTHENTICATOR_REQUESTS` frame, and the client responds with a sequence of `CERTIFICATE` frames, each containing an Exported Authenticator.
 
-In both cases, the server provides a set of authenticator request contexts using the `AUTHENTICATOR_REQUESTS` frame. The client replies with one or more `CERTIFICATE` frames, each containing an Exported Authenticator constructed using one of the received contexts.
+The server may initiate additional authentication exchanges later in the connection, provided the total number of requested credentials does not exceed the client's declared limit.
 
 ## Certificate Validation and Authorization
 
-This protocol does not define certificate validation or access control policies. The interpretation and acceptance of client-provided certificates are delegated entirely to the application.
+Client authentication using this mechanism is initiated by the server in response to the client's advertised support.
 
 Servers are expected to evaluate the received credentials according to their policy and decide whether to:
 
@@ -87,120 +86,59 @@ This mechanism does not define any explicit protocol-level signaling for certifi
 
 # Negotiating Support for HTTP-layer Client Certificate Authentication
 
-Support for HTTP-layer client certificate authentication is negotiated via a `SETTINGS` parameter. An endpoint MUST NOT send frames related to client authentication (`REQUEST_CLIENT_AUTH`, `AUTHENTICATOR_REQUESTS`, or client-initiated `CERTIFICATE`) unless the peer has explicitly advertised support via the `SETTINGS` parameter defined in {{settings-http-client-cert-auth}}.
+Support for HTTP-layer client certificate authentication is negotiated via a `SETTINGS` parameter. An endpoint MUST NOT send frames related to client authentication (`AUTHENTICATOR_REQUESTS`, or client-initiated `CERTIFICATE`) unless the peer has explicitly advertised support via the `SETTINGS` parameter defined in {{settings-http-client-cert-auth}}.
 
 This restriction does not apply to server-initiated `CERTIFICATE` frames, which are governed by {{SECONDARY-SERVER}}.
 
 ## SETTINGS_HTTP_CLIENT_CERT_AUTH {#settings-http-client-cert-auth}
 
-A new `SETTINGS` parameter is defined for both HTTP/2 and HTTP/3 to indicate support for HTTP-layer client certificate authentication. The value of this parameter MUST be either 0 or 1.
+A new `SETTINGS` parameter is defined for both HTTP/2 and HTTP/3 to indicate support for HTTP-layer client certificate authentication.
 
-Each endpoint must advertise its own support. A client MUST NOT send `REQUEST_CLIENT_AUTH` or `CERTIFICATE` frames unless both parties have advertised support for this mechanism. Similarly, a server MUST NOT send an `AUTHENTICATOR_REQUESTS` frame unless both parties have advertised support.
+Clients use this parameter to advertise the maximum number of certificate-based credentials they are expecting to provide during the lifetime of the connection. This value MUST be a non-zero integer. A value of zero indicates that the client does not support client certificate authentication.
 
-Endpoints MUST NOT send a `SETTINGS_HTTP_CLIENT_CERT_AUTH` parameter with a value of 0 after previously sending a value of 1. Once support for this extension has been advertised, it is considered enabled for the lifetime of the connection.
+Servers that support this mechanism MUST respond with a value of 1 to confirm support. The server's value does not affect the number of authenticator requests it can send; it merely confirms participation in the protocol.
+
+Each endpoint must advertise its own support. A client MUST NOT send `CERTIFICATE` frames unless both parties have advertised support for this mechanism. Similarly, a server MUST NOT send an `AUTHENTICATOR_REQUESTS` frame unless both parties have advertised support.
+
+Endpoints MUST NOT send a `SETTINGS_HTTP_CLIENT_CERT_AUTH` parameter with a value of 0 after previously sending a value greater than 0. Once support for this extension has been advertised, it is considered enabled for the lifetime of the connection.
 
 ### HTTP/2 Definition
 
 In HTTP/2, this parameter is defined as an entry in the `SETTINGS` frame as specified in {{Section 6.5.2 of H2}}.
 
 - Identifier: `SETTINGS_HTTP_CLIENT_CERT_AUTH` (0xTBD)
-- Value: 0 indicates that the sender does not support this extension; 1 indicates support for receiving client certificate authentication frames.
+- Value set by clients: A positive integer indicating the number of credentials they are willing to provide.
+- Value set by servers: 1 to indicate support.
 
 ### HTTP/3 Definition
 
 In HTTP/3, this parameter is defined as a `SETTINGS` parameter in accordance with {{Section 7.2.4.1 of H3}}.
 
 - Identifier: `SETTINGS_HTTP_CLIENT_CERT_AUTH` (0xTBD)
-- Value: 0 indicates no support; 1 indicates support.
-
-# Client Request for Server Authenticators
-
-When a client wishes to initiate HTTP-layer certificate authentication, it begins by sending an `REQUEST_CLIENT_AUTH` frame. This frame signals the client's intent to provide one or more certificates and asks the server to generate a corresponding number of authenticator request contexts, which are returned in an `AUTHENTICATOR_REQUESTS` frame.
-
-A client MUST NOT send an `REQUEST_CLIENT_AUTH` frame unless both endpoints have negotiated support for the HTTP-layer client certificate authentication mechanism via the `SETTINGS_HTTP_CLIENT_CERT_AUTH` parameter as described in {{settings-http-client-cert-auth}}.
-
-If a server receives an `REQUEST_CLIENT_AUTH` frame and has not negotiated this extension, it MUST treat the event as a connection error. In HTTP/3, the connection MUST be closed with an `H3_FRAME_UNEXPECTED` error according to {{Section 8 of H3}}. In HTTP/2, the connection MUST be closed with a `PROTOCOL_ERROR` according to {{Section 5.4.1 of H2}}.
-
-## REQUEST_CLIENT_AUTH Frame
-
-The `REQUEST_CLIENT_AUTH` frame is used by a client to request one or more authenticator request contexts from the server. This frame is only valid if both endpoints have negotiated support for HTTP-layer client certificate authentication.
-
-This frame is used exclusively by clients and is considered a control frame. Its format and transport differ depending on the HTTP version in use.
-
-### HTTP/2 Definition
-
-The `REQUEST_CLIENT_AUTH` frame is sent on stream 0.
-
-~~~~~~~~~~ ascii-art
-REQUEST_CLIENT_AUTH Frame {
-  Length (24),
-  Type (8) = 0xTBD,
-  Unused Flags (8),
-
-  Reserved (1),
-  Stream Identifier (31) = 0,
-
-  Authenticator Count (i),
-}
-~~~~~~~~~~
-{: title="HTTP/2 REQUEST_CLIENT_AUTH Frame"}
-
-The `Authenticator Count` field is a variable-length integer that specifies how many authenticator request contexts the client is prepared to respond to. The value of this field MUST be greater than zero. Variable-length integers are encoded as described in {{Section 16 of ?QUIC=RFC9000}}.
-
-If the server receives an `REQUEST_CLIENT_AUTH` frame with a Authenticator Count set to zero, it MUST treat it as a connection error of type `PROTOCOL_ERROR` according to {{Section 5.4.1 of H2}}.
-
-If this frame is received on a stream other than stream 0, the recipient MUST treat it as a connection error of type `PROTOCOL_ERROR`.
-
-### HTTP/3 Definition
-
-The `REQUEST_CLIENT_AUTH` frame is sent on the control stream.
-
-~~~~~~~~~~ ascii-art
-REQUEST_CLIENT_AUTH Frame {
-  Length (i),
-  Type (i) = 0xTBD,
-
-  Authenticator Count (i),
-}
-~~~~~~~~~~
-{: title="HTTP/3 REQUEST_CLIENT_AUTH Frame"}
-
-The Authenticator Count field is a variable-length integer that specifies how many authenticator request contexts the client is prepared to respond to. The value of this field MUST be greater than zero. Variable-length integers are encoded as described in {{Section 16 of QUIC}}.
-
-If the server receives an `REQUEST_CLIENT_AUTH` frame with a Authenticator Count set to zero, it MUST treat it as a connection error of type `H3_MESSAGE_ERROR` according to {{Section 8 of H3}}.
-
-If this frame is received on a stream other than the control stream, the recipient MUST treat it as a connection error of type `H3_FRAME_UNEXPECTED`.
-
-## Server Behavior and Request Handling
-
-Upon receiving an `REQUEST_CLIENT_AUTH` frame, the server MUST respond with an `AUTHENTICATOR_REQUESTS` frame (as defined in {{authenticator-requests}}). The `AUTHENTICATOR_REQUESTS` frame carries a list of authenticator requests that the client is expected to satisfy. This list MAY be empty.
-
-If the server is not prepared to generate any authenticator requests, or does not wish to accept client certificate authentication at this time, it MUST respond with an `AUTHENTICATOR_REQUESTS` frame that contains an empty list of authenticators.
-
-The server MAY include fewer authenticator requests than the number requested by the client. This allows the server to limit the state it must retain while waiting for the client to respond with corresponding `CERTIFICATE` frames.
-
-A client MUST NOT send a new `REQUEST_CLIENT_AUTH` frame until all of the following conditions are met:
-
-- It has received an `AUTHENTICATOR_REQUESTS` frame from the server in response to the previous request;
-- It has sent a `CERTIFICATE` frame for each authenticator included in that response.
-
-If the server receives an `REQUEST_CLIENT_AUTH` frame that violates these conditions, such as being sent before the previous exchange has completed, it MUST treat this as a connection error. In HTTP/2, the server MUST terminate the connection with a `PROTOCOL_ERROR` according to {{Section 5.4.1 of H2}}. In HTTP/3, it MUST terminate the connection with H3_FRAME_UNEXPECTED according to {{Section 8 of H3}}.
+- Value set by clients: A positive integer indicating the number of credentials they are willing to provide.
+- Value set by servers: 1 to indicate support.
 
 # Authentication Procedure
 
-The authentication procedure begins when the server sends an `AUTHENTICATOR_REQUESTS` frame to the client. This may occur in response to a `REQUEST_CLIENT_AUTH` frame previously sent by the client, or independently, if the server wishes to initiate client authentication based on its own policy.
+Once both endpoints have negotiated support for HTTP-layer client certificate authentication via `SETTINGS_HTTP_CLIENT_CERT_AUTH` as described in {{settings-http-client-cert-auth}}), the server may initiate client authentication at any time by sending an `AUTHENTICATOR_REQUESTS` frame.
 
-The `AUTHENTICATOR_REQUESTS` frame contains a list of authenticator requests, as defined in {{Section 4 of EXPORTED-AUTH}}. Each request presents a cryptographic challenge for the client to use in the construction of a corresponding Exported Authenticator. The list of authenticator requests MAY be empty, indicating that the server is not currently accepting client authentication but acknowledges the `REQUEST_CLIENT_AUTH` request.
+The `AUTHENTICATOR_REQUESTS` frame contains a list of authenticator requests, as defined in {{Section 4 of EXPORTED-AUTH}}. Each request presents a cryptographic challenge for the client to use in the construction of a corresponding Exported Authenticator.
 
-The client responds by sending a `CERTIFICATE` frame for each authenticator request provided. Each `CERTIFICATE` frame carries an Exported Authenticator that includes a certificate chain and proof of possession, as specified in {{Section 5 of EXPORTED-AUTH}}. A client may send an empty authenticator as defined in {{Section 6 of EXPORTED-AUTH}} in cases where it declines to authenticate for a given request.
+The client MAY use provided authenticator requests to send `CERTIFICATE` frames. Each `CERTIFICATE` frame carries an Exported Authenticator that includes a certificate chain and proof of possession, as specified in {{Section 5 of EXPORTED-AUTH}}. A client MAY send an empty authenticator as defined in {{Section 6 of EXPORTED-AUTH}} in cases where it declines to authenticate for a given request.
 
 This section defines the structure of the `AUTHENTICATOR_REQUESTS` frame and outlines how it and the `CERTIFICATE` frames, as defined in {{SECONDARY-SERVER}}, are exchanged, ordered, and validated during the authentication process.
 
 ## AUTHENTICATOR_REQUESTS Frame {#authenticator-requests}
 
-The `AUTHENTICATOR_REQUESTS` frame is sent by the server to deliver authenticator requests to the client. It may be used in response to a `REQUEST_CLIENT_AUTH` frame or sent independently. The list of authenticator requests MAY be empty, in which case the frame serves to acknowledge the client's request without initiating authentication.
+The `AUTHENTICATOR_REQUESTS` frame is sent by the server to deliver authenticator requests to the client. It may be sent at any point after the client has advertised support via the `SETTINGS_HTTP_CLIENT_CERT_AUTH` parameter.
 
-Each authenticator request is used by the client to construct an Exported Authenticator as defined in {{Section 5 of EXPORTED-AUTH}}. This frame is sent only after support for HTTP-layer client certificate authentication has been negotiated via `SETTINGS_HTTP_CLIENT_CERT_AUTH` as described in {{settings-http-client-cert-auth}}. It is a control frame and MUST be sent on stream 0 in HTTP/2 or the control stream in HTTP/3.
+The server MAY send multiple `AUTHENTICATOR_REQUESTS` frames over the lifetime of the connection. However, the total number of outstanding authenticator requests (those for which the client has not yet responded with a `CERTIFICATE` frame) MUST NOT exceed the maximum specified by the client in its `SETTINGS_HTTP_CLIENT_CERT_AUTH` parameter. If this limit is exceeded, the client MUST treat it as a connection error.
+
+The server MAY send additional `AUTHENTICATOR_REQUESTS` frames after receiving one or more `CERTIFICATE` frames from the client, in order to replenish the client's pool of active challenges. This allows the server to control the pace of client authentication while adhering to the negotiated limits.
+
+The list of authenticator requests in `AUTHENTICATOR_REQUESTS` frame MUST NOT be empty.
+
+Each authenticator request is used by the client to construct an Exported Authenticator as defined in {{Section 5 of EXPORTED-AUTH}}. This frame is a control frame and MUST be sent on stream 0 in HTTP/2 or the control stream in HTTP/3.
 
 ### HTTP/2 Definition
 
@@ -253,13 +191,13 @@ Authenticator Request {
 - Length (i): A variable-length integer specifying the length, in bytes, of the ClientCertificateRequest.
 - ClientCertificateRequest: A structure as defined in {{Section 4 of EXPORTED-AUTH}}.
 
-The payload of the `AUTHENTICATOR_REQUESTS` frame consists of a sequence of these Authenticator Request elements. The list MAY be empty. Clients parse the payload by reading the length, then interpreting the following bytes as a ClientCertificateRequest structure.
+The payload of the `AUTHENTICATOR_REQUESTS` frame consists of a sequence of these Authenticator Request elements. The list MUST NOT be empty. Clients parse the payload by reading the length, then interpreting the following bytes as a ClientCertificateRequest structure.
 
 ### Request Ordering and Pacing
 
 Clients MUST respond to each authenticator request context with a corresponding `CERTIFICATE` frame, in the same order as the authenticator requests appeared in the `AUTHENTICATOR_REQUESTS` frame.
 
-A client MUST NOT accept a new `AUTHENTICATOR_REQUESTS` frame while a previous one is still outstanding. Specifically, if the client has received an `AUTHENTICATOR_REQUESTS` frame and has not yet sent a `CERTIFICATE` frame for each contained request, it MUST treat any additional `AUTHENTICATOR_REQUESTS` frame as a connection error.
+The total number of outstanding authenticator requests MUST NOT exceed the value the client advertised in the `SETTINGS_HTTP_CLIENT_CERT_AUTH` parameter. If the server exceeds this limit, the client MUST treat it as a connection error.
 
 In HTTP/2, the connection MUST be closed with a PROTOCOL_ERROR according to {{Section 5.4.1 of H2}}. In HTTP/3, the connection MUST be closed with `H3_FRAME_UNEXPECTED` according to {{Section 8 of H3}}.
 
@@ -313,9 +251,9 @@ Applications MUST ensure that any authenticated identity is scoped to the connec
 
 ## Denial-of-Service Risk
 
-The process of generating authenticator requests, tracking their state, and verifying the resulting authenticators can be computationally expensive for the server. A malicious or misbehaving client could send repeated or excessive `REQUEST_CLIENT_AUTH` frames to force the server to consume memory, perform cryptographic operations, or hold open authentication state.
+The process of generating authenticator requests, tracking their state, and verifying the resulting authenticators can be computationally expensive for the server. A malicious or misbehaving client could send excessive `CERTIFICATE` frames to force the server to consume memory, perform cryptographic operations, or maintain authentication state unnecessarily.
 
-Servers SHOULD apply limits on the number of authenticator requests they are willing to issue in response to a single request. Servers MAY respond with fewer `AUTHENTICATOR_REQUESTS` than requested or with an empty list. Implementations SHOULD bound memory and compute usage per connection to mitigate such attacks.
+Servers SHOULD enforce limits on the number of authenticator requests they are willing to issue. Servers MAY respond with fewer Authenticator Requests than requested by the client or choose not to repelish consumed requests with new ones. Implementations SHOULD bound memory and compute usage per connection to mitigate such attacks.
 
 ## Timing Side Channels
 
@@ -323,17 +261,11 @@ Applications should consider the potential for timing side channels in certifica
 
 # IANA Considerations
 
-This document registers the `REQUEST_CLIENT_AUTH` and `AUTHENTICATOR_REQUESTS` frame types and `SETTINGS_HTTP_CLIENT_CERT_AUTH` for both {{H2}} and {{H3}}.
+This document registers the `AUTHENTICATOR_REQUESTS` frame type and `SETTINGS_HTTP_CLIENT_CERT_AUTH` for both {{H2}} and {{H3}}.
 
 ## HTTP/2 Frame Types
 
-This specification registers the following entries in the "HTTP/2 Frame Types" registry defined in {{H2}}:
-
-`REQUEST_CLIENT_AUTH` frame:
-
-- Code: 0xTBD
-- Frame Type: REQUEST_CLIENT_AUTH
-- Reference: This document
+This specification registers the following entry in the "HTTP/2 Frame Types" registry defined in {{H2}}:
 
 `AUTHENTICATOR_REQUESTS` frame:
 
@@ -343,17 +275,7 @@ This specification registers the following entries in the "HTTP/2 Frame Types" r
 
 ## HTTP/3 Frame Types
 
-This specification registers the following entries in the "HTTP/3 Frame Types" registry defined in {{H3}}:
-
-`REQUEST_CLIENT_AUTH` frame:
-
-- Value: 0xTBD
-- Frame Type: REQUEST_CLIENT_AUTH
-- Status: provisional (permanent if this document is approved)
-- Reference: This document
-- Change Controller: Yaroslav Rosomakho (IETF if this document is approved)
-- Contact: yrosomakho@zscaler.com (HTTP_WG; HTTP working group; ietf-http-wg@w3.org if this document is approved)
-- Notes: None
+This specification registers the following entry in the "HTTP/3 Frame Types" registry defined in {{H3}}:
 
 `AUTHENTICATOR_REQUESTS` frame:
 
