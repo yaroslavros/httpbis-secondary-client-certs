@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-06T02:08:47.168257+00:00",
+  "timestamp": "2025-07-08T02:00:41.336412+00:00",
   "repo": "yaroslavros/httpbis-secondary-client-certs",
   "labels": [
     {
@@ -84,26 +84,42 @@
       "id": "PR_kwDOOc22Vc6cmfhT",
       "title": "Simplified flow to reduce number of frame types",
       "url": "https://github.com/yaroslavros/httpbis-secondary-client-certs/pull/2",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "yaroslavros",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-06-29T22:41:00Z",
-      "updatedAt": "2025-06-29T22:41:09Z",
+      "updatedAt": "2025-07-07T16:10:28Z",
       "baseRepository": "yaroslavros/httpbis-secondary-client-certs",
       "baseRefName": "main",
       "baseRefOid": "e78fbaed6173de8fddb09813c6b4b51b193a3945",
       "headRepository": "yaroslavros/httpbis-secondary-client-certs",
       "headRefName": "simplify",
       "headRefOid": "8f8a1f0acd884b9c4e745477c221a75147aafce1",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2025-07-07T16:10:28Z",
+      "mergedAt": "2025-07-07T16:10:28Z",
+      "mergedBy": "yaroslavros",
+      "mergeCommit": {
+        "oid": "5f814de52f88f783097a44513e5e804fdf4b261c"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOOc22Vc6yfEiU",
+          "commit": {
+            "abbreviatedOid": "8f8a1f0"
+          },
+          "author": "jhoyla",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "LGTM",
+          "createdAt": "2025-07-07T16:09:31Z",
+          "updatedAt": "2025-07-07T16:09:31Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
